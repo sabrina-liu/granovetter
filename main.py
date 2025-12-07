@@ -525,13 +525,11 @@ def run_parallel_experiments_single_setting(
 
     tasks = list(itertools.product(strategies, range(config.n_runs)))
     per_run_results: List[Dict[str, object]] = []
-    ts_rows: List[Dict[str, object]] = []
 
     t0 = time.perf_counter()
     with ProcessPoolExecutor(max_workers=config.n_workers) as executor:
-        future_to_task = {}
-        for strategy, run_id in tasks:
-            future = executor.submit(
+        future_to_task = {
+            executor.submit(
                 _single_run_worker,
                 strategy,
                 run_id,
@@ -540,24 +538,14 @@ def run_parallel_experiments_single_setting(
                 degree_ranking,
                 betweenness_ranking,
                 config,
-            )
-            future_to_task[future] = (strategy, run_id)
+            ): (strategy, run_id)
+            for strategy, run_id in tasks
+        }
 
         for future in as_completed(future_to_task):
             strategy, run_id = future_to_task[future]
             res = future.result()
             per_run_results.append(res)
-
-            adoption_history = res["adoption_history"]
-            for t_idx, frac in enumerate(adoption_history):
-                ts_rows.append(
-                    {
-                        "strategy": strategy,
-                        "run_id": run_id,
-                        "time_step": t_idx,
-                        "fraction_active": frac,
-                    }
-                )
 
     LOGGER.info(
         "Finished tau=%.3f, seed_fraction=%.3f in %.2f seconds.",
@@ -579,6 +567,29 @@ def run_parallel_experiments_single_setting(
             }
         )
     per_run_df = pd.DataFrame(summary_rows)
+
+    # time series data
+    max_T = max(len(res["adoption_history"]) for res in per_run_results)
+
+    ts_rows: List[Dict[str, object]] = []
+    for res in per_run_results:
+        strategy = res["strategy"]
+        run_id = res["run_id"]
+        hist = list(res["adoption_history"])
+        last = hist[-1]
+        if len(hist) < max_T:
+            hist = hist + [last] * (max_T - len(hist))
+
+        for t_idx, frac in enumerate(hist):
+            ts_rows.append(
+                {
+                    "strategy"        : strategy,
+                    "run_id"          : run_id,
+                    "time_step"       : t_idx,
+                    "fraction_active" : frac,
+                }
+            )
+
     ts_df = pd.DataFrame(ts_rows)
 
     # aggregate by strategy
@@ -704,9 +715,7 @@ def main() -> None:
 
     # 1. Build network
     G = build_coauthorship_graph(
-        csv_path=args.uva_csv_path,
-        min_year=args.min_year,
-        max_year=args.max_year,
+        csv_path=args.uva_csv_path
     )
 
     # 2. Compute centrality rankings
@@ -791,8 +800,6 @@ def main() -> None:
         "max_steps"      : args.max_steps,
         "n_workers"      : args.n_workers,
         "betweenness_k"  : args.betweenness_k,
-        "min_year"       : args.min_year,
-        "max_year"       : args.max_year,
         "n_nodes"        : G.number_of_nodes(),
         "n_edges"        : G.number_of_edges(),
         "density"        : nx.density(G),
@@ -807,4 +814,3 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
-
