@@ -186,6 +186,12 @@ Minimal structure for this assignment:
 ├── ass2_aggregate_all.csv
 ├── ass2_ts_all.csv
 ├── ass2_mean_curves_all.csv
+├── plots.ipynb                 # Visualisations
+├── adoption_curves_grid_by_strategy.png
+├── adoption_curves_grid_tau_by_seed.png
+├── adoption_curves_grid_tau_by_seed_varying_timescale.png
+├── final_adoption_heatmap.png
+├── strategy_comparison_tau20_s001.png
 └── README.md                   # This file
 ```
 
