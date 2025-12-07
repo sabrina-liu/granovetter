@@ -3,7 +3,7 @@
 This repository implements Granovetter-style threshold dynamics on the UvA co-authorship network constructed in Assignment 1, as part of:
 
 > **Assignment 2 — Dynamics on Networks: Thresholds and Spreading**
-> Complex Systems & Policy (Model Based Decisions, 2025) — Universiteit van Amsterdam
+> Complex Systems & Policy (Model Based Decisions, 2025), Universiteit van Amsterdam
 > Lecturer: Michael Lees
 
 ## Brief Abstract
@@ -19,9 +19,7 @@ The script:
   * Runs multiple independent simulations in parallel.
   * Records adoption curves over time and summary metrics.
 * Exports CSVs with per-run metrics, time series, and aggregated statistics.
-
-The analysis quantifies how network structure and seeding strategy (random, high-degree, high-betweenness) shape diffusion speed and final adoption.
-
+  
 ---
 
 ## Implementation Notes
@@ -116,8 +114,7 @@ python main.py \
   --max-steps 200 \
   --n-workers 14 \
   --betweenness-k 200 \
-  --output-prefix ass2 \
-  --save-representative-adoption-times
+  --output-prefix ass2 
 ```
 
 ### Key Arguments
@@ -148,9 +145,6 @@ python main.py \
 
 * `--output-prefix`
   Prefix for all output files.
-
-* `--save-representative-adoption-times`
-  If set, runs an additional set of simulations to record **node-level adoption times** for one representative `(τ, seed_fraction)` pair.
 
 ---
 
@@ -206,20 +200,6 @@ Minimal structure for this assignment:
 
 ---
 
-
-
-VM setup:
-
-n2-highcpu-16 16 vCPU, 8 core, 16 GB memory
-
-sudo apt update && sudo apt upgrade -y
-sudo apt install python3-pip python3-venv -y
-
-python3 -m venv env
-source env/bin/activate
-
-pip install --upgrade pip
-pip install networkx numpy pandas matplotlib tqdm
 
 
 
