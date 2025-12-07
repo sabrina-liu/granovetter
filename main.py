@@ -1,7 +1,7 @@
 """
 main.py
 
-Assignment 2 — Dynamics on Networks: Thresholds and Spreading
+Assignment 2: Dynamics on Networks: Thresholds and Spreading
 14244861    Liu, Sabrina    30 November 2025
 
 Granovetter-style threshold dynamics on the UvA co-authorship network.
@@ -807,3 +807,4 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
+
